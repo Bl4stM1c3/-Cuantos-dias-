@@ -1,0 +1,67 @@
+#Posible solucion al ejercicio 16 de https://retosdeprogramacion.com/ejercicios/
+#Crea una función que calcule y retorne cuántos días hay entre dos cadenas
+#de texto que representen fechas.
+#-Una cadena de texto que representa una fecha tiene el formato "dd/MM/yyyy".
+#- La función recibirá dos String y retornará un Int.
+#- La diferencia en días será absoluta (no importa el orden de las fechas).
+#- Si una de las dos cadenas de texto no representa una fecha correcta se
+#  lanzará una excepción.
+#El ejercicio se resulve sin recurir a la libreria datetime
+
+def cuantos_dias(fecha1, fecha2):
+
+  #Funcion para comprobar la validez de las fechas
+  def validar_fecha(fecha):
+    try:
+      #Comprobamos que las fechas sean cadenas de texto
+      if not isinstance(fecha, str):
+        raise ValueError(f"La fecha '{fecha}' debe ser una cadena en formato 'dd/mm/aaa'")
+      #Separamos la fecha en dia mes y año transformandolas en int
+      dia, mes, año = map(int, fecha.split("/"))
+      dias_meses = {1:31, 2:29 if es_bisiesto(año) else 28, 
+                      3:31, 4:30, 5:31, 
+                      6:30, 7:31, 8:31,
+                      9:30, 10:31, 11:30, 12:31}
+      elif dia < 1 or dia > 31: 
+        raise ValueError(f"El valor del dia ha de estar comprendido entre 1 y 31")
+      elif mes < 1 or mes > 12:
+        raise ValueError(f"El valor del mes ha de estar comprendido entre 1 y 12"}
+      elif dia > dias_meses[mes]:
+        raise ValueError(f"El dia {dia} excede del maximo de {dias_meses[mes]} dias para el mes {mes}")
+      return dia, mes, año
+    except ValueError as e:
+      print(f"La fecha '{fecha}' introducida no es válida: {e}")
+      return None
+
+  #Funcion para comprobar si el año es bisiesto
+  def es_bisiesto(año):
+    return año % 4 == 0 and (año % 100 != 0 or año % 400 == 0)
+
+  #Calculamos los dias que suponen los años completos desde el año 0 hasta el año anterior considerndo los años bisiestos
+  def dias_año(año):
+    bisiestos = sum(1 for x in range(año) if x % 4 == 0 and (x % 100 != 0 or x % 400 == 0))
+    return 365 * (año - 1) + bisiestos
+
+  #Calculamos los dias transcurridos a lo largo del año hasta el mes anterior al de la fecha dada
+  def dias_meses(mes):
+    dias_meses = {1:31, 2:29 if es_bisiesto(año) else 28, 
+                      3:31, 4:30, 5:31, 
+                      6:30, 7:31, 8:31,
+                      9:30, 10:31, 11:30, 12:31}
+    return sum(dias_meses[key] for key in range(1, mes))
+
+  #Validamos las fechas introducidas
+  fecha1_valida = validar_fecha(fecha1)
+  fecha2_valida = validar_fecha(fecha2)
+  if not fecha1_valida or fecha2_valida:
+    return "Introduzca una fecha en formato dd/mm/aaaa"
+
+  #Extraemos los componentes de la fecha
+  dia1, mes1, año1 = fecha1_valida
+  dia2, mes2, año2 = fecha2_valida
+
+  return abs((dia1 + dias_meses(mes1) + dias_año(año1)) - (dia2 + dias_meses(mes2) + dias_año(año2)))
+
+
+
+
